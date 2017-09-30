@@ -34,7 +34,7 @@ module.exports = app => {
           }
         }, {
           $inc: { [choice]: 1 },
-          $set: { 'recipients.$.redponded': true }
+          $set: { 'recipients.$.responded': true }
         }).exec()
       })
       .value()

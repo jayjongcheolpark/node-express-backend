@@ -16,8 +16,8 @@ module.exports = app => {
 
   app.post('/api/surveys/webhooks', (req, res) => {
     const p = new Path('/api/surveys/:surveyId/:choice')
-   
-    const events = _.chain(req.body)
+
+    _.chain(req.body)
       .map(({ email, url }) => {
         const match = p.test(new URL(url).pathname)
         if (match) {
@@ -26,9 +26,21 @@ module.exports = app => {
       })
       .compact()
       .uniqBy('email', 'surveyId')
+      .each(({ surveyId, email, choice }) => {
+        Survey.updateOne({
+          _id: surveyId,
+          recipients: {
+            $elemMatch: { email: email, responded: false }
+          }
+        }, {
+          $inc: { [choice]: 1 },
+          $set: { 'recipients.$.redponded': true }
+        }).exec()
+      })
       .value()
 
-    console.log(events)
+
+
 
     res.send({})
   })
@@ -40,7 +52,7 @@ module.exports = app => {
       title,
       subject,
       body,
-      recipients: recipients.split(',').map(email => ({ email: email.trim() })), 
+      recipients: recipients.split(',').map(email => ({ email: email.trim() })),
       _user: req.user.id,
       dateSent: Date.now()
     })
@@ -52,7 +64,7 @@ module.exports = app => {
       await survey.save()
       req.user.credits -= 1
       const user = await req.user.save()
-      
+
       res.send(user)
     } catch (err) {
       res.status(422).send(err)

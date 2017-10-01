@@ -10,19 +10,19 @@ const SurveyFormReview = ({ onCancel, formValues, submitSurvey, history }) => {
     return (
       <div>
         <label>{label}</label>
-        <div>
+        <div key={label}>
           {formValues[name]}
         </div>
       </div>
     )
-  }) 
+  })
 
   return (
     <div>
       <h5>Please confirm your entries</h5>
       {reviewFields}
       <buttom
-        className="yellow darken-3 white-text btn-flat" 
+        className="yellow darken-3 white-text btn-flat"
         onClick={onCancel}
       >
         Back
@@ -40,8 +40,8 @@ const SurveyFormReview = ({ onCancel, formValues, submitSurvey, history }) => {
 
 function mapStateToProps({ form }) {
   return {
-    formValues: form.surveyForm.values 
-  } 
+    formValues: form.surveyForm.values
+  }
 }
 
 export default connect(mapStateToProps, actions)(withRouter(SurveyFormReview))
